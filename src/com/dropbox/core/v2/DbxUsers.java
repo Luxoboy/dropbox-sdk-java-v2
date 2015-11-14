@@ -22,18 +22,15 @@ import com.dropbox.core.json.JsonWriter;
 /**
  * Classes and routes in namespace "users".
  */
-public final class Users {
+public final class DbxUsers {
     // namespace users
 
     private final DbxRawClientV2 client;
 
-    Users(DbxRawClientV2 client) {
+    DbxUsers(DbxRawClientV2 client) {
         this.client = client;
     }
 
-    /**
-     * Arguments for {@link #getAccount}.
-     */
     public static class GetAccountArg {
         // struct GetAccountArg
         /**
@@ -117,9 +114,6 @@ public final class Users {
         }
     }
 
-    /**
-     * Error returned by {@link #getAccount}.
-     */
     public enum GetAccountError {
         // union GetAccountError
         /**
@@ -511,9 +505,6 @@ public final class Users {
             }
             if (locale.length() < 2) {
                 throw new RuntimeException("String 'locale' is shorter than 2");
-            }
-            if (locale.length() > 2) {
-                throw new RuntimeException("String 'locale' is longer than 2");
             }
             this.referralLink = referralLink;
             if (referralLink == null) {
@@ -1339,6 +1330,259 @@ public final class Users {
         }
     }
 
+    public static class GetAccountBatchArg {
+        // struct GetAccountBatchArg
+        /**
+         * List of user account identifiers.  Should not contain any duplicate
+         * account IDs.
+         */
+        public final java.util.ArrayList<String> accountIds;
+
+        public GetAccountBatchArg(java.util.ArrayList<String> accountIds) {
+            this.accountIds = accountIds;
+            if (accountIds == null) {
+                throw new RuntimeException("Required value for 'accountIds' is null");
+            }
+            if (accountIds.size() < 1) {
+                throw new RuntimeException("List 'accountIds' has fewer than 1 items");
+            }
+            for (String x : accountIds) {
+                if (x == null) {
+                    throw new RuntimeException("An item in list 'accountIds' is null");
+                }
+                if (x.length() < 40) {
+                    throw new RuntimeException("String 'an item in list field accountIds' is shorter than 40");
+                }
+                if (x.length() > 40) {
+                    throw new RuntimeException("String 'an item in list field accountIds' is longer than 40");
+                }
+            }
+        }
+        static final JsonWriter<GetAccountBatchArg> _writer = new JsonWriter<GetAccountBatchArg>()
+        {
+            public final void write(GetAccountBatchArg x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStartObject();
+                GetAccountBatchArg._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(GetAccountBatchArg x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeFieldName("account_ids");
+                g.writeStartArray();
+                for (String item: x.accountIds) {
+                    if (item != null) {
+                        g.writeString(item);
+                    }
+                }
+                g.writeEndArray();
+            }
+        };
+
+        public static final JsonReader<GetAccountBatchArg> _reader = new JsonReader<GetAccountBatchArg>() {
+
+            public final GetAccountBatchArg read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                GetAccountBatchArg result;
+                JsonReader.expectObjectStart(parser);
+                result = readFields(parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final GetAccountBatchArg readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                java.util.ArrayList<String> accountIds = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("account_ids".equals(fieldName)) {
+                        accountIds = JsonArrayReader.mk(JsonReader.StringReader)
+                            .readField(parser, "account_ids", accountIds);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                if (accountIds == null) {
+                    throw new JsonReadException("Required field \"account_ids\" is missing.", parser.getTokenLocation());
+                }
+                return new GetAccountBatchArg(accountIds);
+            }
+        };
+
+        public String toString() {
+            return "GetAccountBatchArg." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "GetAccountBatchArg." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static GetAccountBatchArg fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+
+    public static final class GetAccountBatchError {
+        // union GetAccountBatchError
+
+        /**
+         * The discriminating tag type for {@link GetAccountBatchError}.
+         */
+        public enum Tag {
+            noAccount,  // String
+            other  // *catch_all
+        }
+
+        /**
+         * The discriminating tag for this instance.
+         */
+        public final Tag tag;
+
+        private final String noAccountValue;
+        private GetAccountBatchError(Tag t, String v) {
+            tag = t;
+            noAccountValue = v;
+            validate();
+        }
+        /**
+         * The value is an account ID specified in {@code
+         * getAccountBatchArg.accountIds} that does not exist.
+         */
+        public static GetAccountBatchError noAccount(String v) {
+            return new GetAccountBatchError(Tag.noAccount, v);
+        }
+        public String getNoAccount() {
+            if (tag != Tag.noAccount) {
+                throw new RuntimeException("getNoAccount() requires tag==noAccount, actual tag=="+tag);
+            }
+            return noAccountValue;
+        }
+
+        public static final GetAccountBatchError other = new GetAccountBatchError(Tag.other);
+
+        private GetAccountBatchError(Tag t) {
+            tag = t;
+            noAccountValue = null;
+            validate();
+        }
+
+        private void validate()
+        {
+            switch (tag) {
+                case other:
+                    break;
+                case noAccount:
+                    if (this.noAccountValue == null) {
+                        throw new RuntimeException("Required value for 'noAccount' is null");
+                    }
+                    if (this.noAccountValue.length() < 40) {
+                        throw new RuntimeException("String 'this.noAccountValue' is shorter than 40");
+                    }
+                    if (this.noAccountValue.length() > 40) {
+                        throw new RuntimeException("String 'this.noAccountValue' is longer than 40");
+                    }
+                    break;
+            }
+        }
+        static final JsonWriter<GetAccountBatchError> _writer = new JsonWriter<GetAccountBatchError>()
+        {
+            public final void write(GetAccountBatchError x, JsonGenerator g)
+              throws IOException
+            {
+                switch (x.tag) {
+                    case noAccount:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("no_account");
+                        g.writeStringField("no_account", x.noAccountValue);
+                        g.writeEndObject();
+                        break;
+                    case other:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("other");
+                        g.writeEndObject();
+                        break;
+                }
+            }
+        };
+        public static final JsonReader<GetAccountBatchError> _reader = new JsonReader<GetAccountBatchError>()
+        {
+            public final GetAccountBatchError read(JsonParser parser)
+              throws IOException, JsonReadException
+            {
+                if (parser.getCurrentToken() == JsonToken.VALUE_STRING) {
+                    String text = parser.getText();
+                    parser.nextToken();
+                    Tag tag = _values.get(text);
+                    if (tag == null) { return GetAccountBatchError.other; }
+                    switch (tag) {
+                        case other: return GetAccountBatchError.other;
+                    }
+                    throw new JsonReadException("Tag " + tag + " requires a value", parser.getTokenLocation());
+                }
+                JsonReader.expectObjectStart(parser);
+                String[] tags = readTags(parser);
+                assert tags != null && tags.length == 1;
+                String text = tags[0];
+                Tag tag = _values.get(text);
+                GetAccountBatchError value = null;
+                if (tag != null) {
+                    switch (tag) {
+                        case noAccount: {
+                            String v = null;
+                            assert parser.getCurrentToken() == JsonToken.FIELD_NAME;
+                            text = parser.getText();
+                            assert tags[0].equals(text);
+                            parser.nextToken();
+                            v = JsonReader.StringReader
+                                .readField(parser, "no_account", v);
+                            value = GetAccountBatchError.noAccount(v);
+                            break;
+                        }
+                        case other: {
+                            value = GetAccountBatchError.other;
+                            break;
+                        }
+                    }
+                }
+                JsonReader.expectObjectEnd(parser);
+                if (value == null) { return GetAccountBatchError.other; }
+                return value;
+            }
+
+        };
+        private static final java.util.HashMap<String,Tag> _values;
+        static {
+            _values = new java.util.HashMap<String,Tag>();
+            _values.put("no_account", Tag.noAccount);
+            _values.put("other", Tag.other);
+        }
+
+        public String toString() {
+            return "GetAccountBatchError." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "GetAccountBatchError." +  _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static GetAccountBatchError fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
     /**
      * Exception thrown by {@link #getAccount}.
      */
@@ -1439,5 +1683,51 @@ public final class Users {
         catch (DbxRequestUtil.ErrorWrapper ew) {
             throw new GetSpaceUsageException();
         }
+    }
+
+    /**
+     * Exception thrown by {@link #getAccountBatch}.
+     */
+    public static class GetAccountBatchException extends DbxApiException {
+        /**
+         * The error reported by getAccountBatch.
+         */
+        public final GetAccountBatchError errorValue;
+
+        public GetAccountBatchException(GetAccountBatchError errorValue) {
+            super("Exception in get_account_batch: " + errorValue);
+            this.errorValue = errorValue;
+        }
+    }
+    /**
+     * Get information about multiple user accounts.  At most 300 accounts may
+     * be queried per request.
+     */
+    private java.util.ArrayList<BasicAccount> getAccountBatch(GetAccountBatchArg arg)
+            throws GetAccountBatchException, DbxException
+    {
+        try {
+            return DbxRawClientV2.rpcStyle(client.getRequestConfig(),
+                                           client.getAccessToken(),
+                                           client.getHost().api,
+                                           "2-beta-2/users/get_account_batch",
+                                           arg,
+                                           GetAccountBatchArg._writer,
+                                           JsonArrayReader.mk(BasicAccount._reader),
+                                           GetAccountBatchError._reader);
+        }
+        catch (DbxRequestUtil.ErrorWrapper ew) {
+            throw new GetAccountBatchException((GetAccountBatchError) (ew.errValue));
+        }
+    }
+    /**
+     * Get information about multiple user accounts.  At most 300 accounts may
+     * be queried per request.
+     */
+    public java.util.ArrayList<BasicAccount> getAccountBatch(java.util.ArrayList<String> accountIds)
+          throws GetAccountBatchException, DbxException
+    {
+        GetAccountBatchArg arg = new GetAccountBatchArg(accountIds);
+        return getAccountBatch(arg);
     }
 }

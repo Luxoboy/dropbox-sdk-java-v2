@@ -1,14 +1,14 @@
 package com.dropbox.core.examples.web_file_browser;
 
 import static com.dropbox.core.util.StringUtil.jq;
-import static com.dropbox.core.util.StringUtil.UTF8;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestUtil;
 import com.dropbox.core.util.IOUtil;
+import com.dropbox.core.util.StringUtil;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.DbxFiles;
 import com.dropbox.core.v2.DbxPathV2;
-import com.dropbox.core.v2.Files;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +47,7 @@ public class DropboxBrowse
                                common.dbxAppInfo.host);
     }
 
-    private boolean checkPathError(HttpServletResponse response, String path, Files.LookupError le)
+    private boolean checkPathError(HttpServletResponse response, String path, DbxFiles.LookupError le)
         throws IOException
     {
         switch (le.tag) {
@@ -62,24 +62,23 @@ public class DropboxBrowse
         throws IOException
     {
         // Get the folder listing from Dropbox.
-        TreeMap<String,Files.Metadata> children = new TreeMap<String,Files.Metadata>();
+        TreeMap<String,DbxFiles.Metadata> children = new TreeMap<String,DbxFiles.Metadata>();
 
-        Files.ListFolderResult result;
-        outer:
+        DbxFiles.ListFolderResult result;
         try {
             try {
                 result = dbxClient.files.listFolder(path);
             }
-            catch (Files.ListFolderException ex) {
-                if (ex.errorValue.tag == Files.ListFolderError.Tag.path) {
+            catch (DbxFiles.ListFolderException ex) {
+                if (ex.errorValue.tag == DbxFiles.ListFolderError.Tag.path) {
                     if (checkPathError(response, path, ex.errorValue.getPath())) return;
                 }
                 throw ex;
             }
 
             while (true) {
-                for (Files.Metadata md : result.entries) {
-                    if (md instanceof Files.DeletedMetadata) {
+                for (DbxFiles.Metadata md : result.entries) {
+                    if (md instanceof DbxFiles.DeletedMetadata) {
                         children.remove(md.pathLower);
                     } else {
                         children.put(md.pathLower, md);
@@ -91,8 +90,8 @@ public class DropboxBrowse
                 try {
                     result = dbxClient.files.listFolderContinue(result.cursor);
                 }
-                catch (Files.ListFolderContinueException ex) {
-                    if (ex.errorValue.tag == Files.ListFolderContinueError.Tag.path) {
+                catch (DbxFiles.ListFolderContinueException ex) {
+                    if (ex.errorValue.tag == DbxFiles.ListFolderContinueError.Tag.path) {
                         if (checkPathError(response, path, ex.errorValue.getPath())) return;
                     }
                     throw ex;
@@ -108,7 +107,7 @@ public class DropboxBrowse
 
         response.setContentType("text/html");
         response.setCharacterEncoding("utf-8");
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), UTF8));
+        PrintWriter out = new PrintWriter(IOUtil.utf8Writer(response.getOutputStream()));
 
         out.println("<html>");
         out.println("<head><title>" + escapeHtml4(path) + "- Web File Browser</title></head>");
@@ -126,7 +125,7 @@ public class DropboxBrowse
         out.println("</form>");
         // Listing of folder contents.
         out.println("<ul>");
-        for (Files.Metadata child : children.values()) {
+        for (DbxFiles.Metadata child : children.values()) {
             String href = "/browse?path=" + DbxRequestUtil.encodeUrlParam(child.pathLower);
             out.println("  <li><a href='" + escapeHtml4(href) + "'>" + escapeHtml4(child.name) + "</a></li>");
         }
@@ -138,14 +137,14 @@ public class DropboxBrowse
         out.flush();
     }
 
-    private void renderFile(HttpServletResponse response, String path, Files.FileMetadata f)
+    private void renderFile(HttpServletResponse response, String path, DbxFiles.FileMetadata f)
         throws IOException
     {
         FormProtection fp = FormProtection.start(response);
 
         response.setContentType("text/html");
         response.setCharacterEncoding("utf-8");
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), UTF8));
+        PrintWriter out = new PrintWriter(IOUtil.utf8Writer(response.getOutputStream()));
 
         out.println("<html>");
         out.println("<head><title>" + escapeHtml4(path) + "- Web File Browser</title></head>");
@@ -192,14 +191,14 @@ public class DropboxBrowse
                 response.sendError(400, "Invalid path: " + jq(path) + ": " + pathError);
                 return;
             }
-            Files.Metadata metadata;
+            DbxFiles.Metadata metadata;
             try {
                 metadata = dbxClient.files.getMetadata(path);
             }
-            catch (Files.GetMetadataException ex) {
+            catch (DbxFiles.GetMetadataException ex) {
                 switch (ex.errorValue.tag) {
                     case path:
-                        Files.LookupError le = ex.errorValue.getPath();
+                        DbxFiles.LookupError le = ex.errorValue.getPath();
                         switch (le.tag) {
                             case notFound:
                                 response.sendError(400, "Path doesn't exist on Dropbox: " + jq(path));
@@ -215,11 +214,11 @@ public class DropboxBrowse
             }
 
             path = DbxPathV2.getParent(path) + "/" + metadata.name;
-            if (metadata instanceof Files.FolderMetadata) {
+            if (metadata instanceof DbxFiles.FolderMetadata) {
                 renderFolder(response, user, dbxClient, path);
             }
             else {
-                renderFile(response, path, (Files.FileMetadata) metadata);
+                renderFile(response, path, (DbxFiles.FileMetadata) metadata);
             }
         }
     }
@@ -262,7 +261,7 @@ public class DropboxBrowse
 
         // Upload file to Dropbox
         String fullTargetPath = targetFolder + "/" + fileName;
-        Files.FileMetadata metadata;
+        DbxFiles.FileMetadata metadata;
         try {
             metadata = dbxClient.files.uploadBuilder(fullTargetPath).run(filePart.getInputStream());
         }
@@ -312,7 +311,7 @@ public class DropboxBrowse
         byte[] bytes = new byte[maxLength];
         InputStream in = part.getInputStream();
         int bytesRead = in.read(bytes);
-        String s = new String(bytes, 0, bytesRead, UTF8);
+        String s = StringUtil.utf8ToString(bytes, 0, bytesRead);
         if (in.read() != -1) {
             response.sendError(400, "Field " + jq(name) + " is too long (the limit is " + maxLength + " bytes): " + jq(s));
             return null;

@@ -22,12 +22,12 @@ import com.dropbox.core.json.JsonWriter;
 /**
  * Classes and routes in namespace "files".
  */
-public final class Files {
+public final class DbxFiles {
     // namespace files
 
     private final DbxRawClientV2 client;
 
-    Files(DbxRawClientV2 client) {
+    DbxFiles(DbxRawClientV2 client) {
         this.client = client;
     }
 
@@ -158,8 +158,690 @@ public final class Files {
     }
 
     /**
-     * Metadata (excluding name or path) for a file.
+     * Dimensions for a photo or video.
      */
+    public static class Dimensions {
+        // struct Dimensions
+        /**
+         * Height of the photo/video.
+         */
+        public final long height;
+        /**
+         * Width of the photo/video.
+         */
+        public final long width;
+
+        public Dimensions(long height, long width) {
+            this.height = height;
+            this.width = width;
+        }
+        static final JsonWriter<Dimensions> _writer = new JsonWriter<Dimensions>()
+        {
+            public final void write(Dimensions x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStartObject();
+                Dimensions._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(Dimensions x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeNumberField("height", x.height);
+                g.writeNumberField("width", x.width);
+            }
+        };
+
+        public static final JsonReader<Dimensions> _reader = new JsonReader<Dimensions>() {
+
+            public final Dimensions read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Dimensions result;
+                JsonReader.expectObjectStart(parser);
+                result = readFields(parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final Dimensions readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Long height = null;
+                Long width = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("height".equals(fieldName)) {
+                        height = JsonReader.UInt64Reader
+                            .readField(parser, "height", height);
+                    }
+                    else if ("width".equals(fieldName)) {
+                        width = JsonReader.UInt64Reader
+                            .readField(parser, "width", width);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                if (height == null) {
+                    throw new JsonReadException("Required field \"height\" is missing.", parser.getTokenLocation());
+                }
+                if (width == null) {
+                    throw new JsonReadException("Required field \"width\" is missing.", parser.getTokenLocation());
+                }
+                return new Dimensions(height, width);
+            }
+        };
+
+        public String toString() {
+            return "Dimensions." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "Dimensions." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static Dimensions fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    /**
+     * GPS coordinates for a photo or video.
+     */
+    public static class GpsCoordinates {
+        // struct GpsCoordinates
+        /**
+         * Latitude of the GPS coordinates.
+         */
+        public final double latitude;
+        /**
+         * Longitude of the GPS coordinates.
+         */
+        public final double longitude;
+
+        public GpsCoordinates(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+        static final JsonWriter<GpsCoordinates> _writer = new JsonWriter<GpsCoordinates>()
+        {
+            public final void write(GpsCoordinates x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStartObject();
+                GpsCoordinates._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(GpsCoordinates x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeNumberField("latitude", x.latitude);
+                g.writeNumberField("longitude", x.longitude);
+            }
+        };
+
+        public static final JsonReader<GpsCoordinates> _reader = new JsonReader<GpsCoordinates>() {
+
+            public final GpsCoordinates read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                GpsCoordinates result;
+                JsonReader.expectObjectStart(parser);
+                result = readFields(parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final GpsCoordinates readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Double latitude = null;
+                Double longitude = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("latitude".equals(fieldName)) {
+                        latitude = JsonReader.Float64Reader
+                            .readField(parser, "latitude", latitude);
+                    }
+                    else if ("longitude".equals(fieldName)) {
+                        longitude = JsonReader.Float64Reader
+                            .readField(parser, "longitude", longitude);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                if (latitude == null) {
+                    throw new JsonReadException("Required field \"latitude\" is missing.", parser.getTokenLocation());
+                }
+                if (longitude == null) {
+                    throw new JsonReadException("Required field \"longitude\" is missing.", parser.getTokenLocation());
+                }
+                return new GpsCoordinates(latitude, longitude);
+            }
+        };
+
+        public String toString() {
+            return "GpsCoordinates." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "GpsCoordinates." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static GpsCoordinates fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    /**
+     * Metadata for a photo or video.
+     */
+    public static class MediaMetadata {
+        // struct MediaMetadata
+        /**
+         * Dimension of the photo/video.
+         */
+        public final Dimensions dimensions;
+        /**
+         * The GPS coordinate of the photo/video.
+         */
+        public final GpsCoordinates location;
+        /**
+         * The timestamp when the photo/video is taken.
+         */
+        public final java.util.Date timeTaken;
+
+        public MediaMetadata(Dimensions dimensions, GpsCoordinates location, java.util.Date timeTaken) {
+            this.dimensions = dimensions;
+            if (dimensions != null) {
+            }
+            this.location = location;
+            if (location != null) {
+            }
+            this.timeTaken = timeTaken;
+        }
+        public JsonWriter getWriter() {
+            return MediaMetadata._writer;
+        }
+        static final JsonWriter<MediaMetadata> _writer = new JsonWriter<MediaMetadata>()
+        {
+            public final void write(MediaMetadata x, JsonGenerator g)
+             throws IOException
+            {
+                JsonWriter w = x.getWriter();
+                if (w != this) {
+                    w.write(x, g);
+                    return;
+                }
+                g.writeStartObject();
+                MediaMetadata._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(MediaMetadata x, JsonGenerator g)
+             throws IOException
+            {
+                if (x.dimensions != null) {
+                    g.writeFieldName("dimensions");
+                    Dimensions._writer.write(x.dimensions, g);
+                }
+                if (x.location != null) {
+                    g.writeFieldName("location");
+                    GpsCoordinates._writer.write(x.location, g);
+                }
+                if (x.timeTaken != null) {
+                    g.writeFieldName("time_taken");
+                    writeDateIso(x.timeTaken, g);
+                }
+            }
+        };
+
+        public static final JsonReader<MediaMetadata> _reader = new JsonReader<MediaMetadata>() {
+
+            public final MediaMetadata read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                MediaMetadata result;
+                JsonReader.expectObjectStart(parser);
+                String[] tags = readTags(parser);
+                result = readFromTags(tags, parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final MediaMetadata readFromTags(String[] tags, JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                if (tags != null && tags.length > 0) {
+                    if ("photo".equals(tags[0])) {
+                        return PhotoMetadata._reader.readFromTags(tags, parser);
+                    }
+                    if ("video".equals(tags[0])) {
+                        return VideoMetadata._reader.readFromTags(tags, parser);
+                    }
+                    // If no match, fall back to base class
+                }
+                return readFields(parser);
+            }
+
+            public final MediaMetadata readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Dimensions dimensions = null;
+                GpsCoordinates location = null;
+                java.util.Date timeTaken = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("dimensions".equals(fieldName)) {
+                        dimensions = Dimensions._reader
+                            .readField(parser, "dimensions", dimensions);
+                    }
+                    else if ("location".equals(fieldName)) {
+                        location = GpsCoordinates._reader
+                            .readField(parser, "location", location);
+                    }
+                    else if ("time_taken".equals(fieldName)) {
+                        timeTaken = JsonDateReader.DropboxV2
+                            .readField(parser, "time_taken", timeTaken);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                return new MediaMetadata(dimensions, location, timeTaken);
+            }
+        };
+
+        public String toString() {
+            return "MediaMetadata." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "MediaMetadata." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static MediaMetadata fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    /**
+     * Metadata for a photo.
+     */
+    public static class PhotoMetadata extends MediaMetadata  {
+        // struct PhotoMetadata
+
+        public PhotoMetadata(Dimensions dimensions, GpsCoordinates location, java.util.Date timeTaken) {
+            super(dimensions, location, timeTaken);
+        }
+        public JsonWriter getWriter() {
+            return PhotoMetadata._writer;
+        }
+        static final JsonWriter<PhotoMetadata> _writer = new JsonWriter<PhotoMetadata>()
+        {
+            public final void write(PhotoMetadata x, JsonGenerator g)
+             throws IOException
+            {
+                JsonWriter w = x.getWriter();
+                if (w != this) {
+                    w.write(x, g);
+                    return;
+                }
+                g.writeStartObject();
+                g.writeStringField(".tag", "photo");
+                MediaMetadata._writer.writeFields(x, g);
+                PhotoMetadata._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(PhotoMetadata x, JsonGenerator g)
+             throws IOException
+            {
+            }
+        };
+
+        public static final JsonReader<PhotoMetadata> _reader = new JsonReader<PhotoMetadata>() {
+
+            public final PhotoMetadata read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                PhotoMetadata result;
+                JsonReader.expectObjectStart(parser);
+                String[] tags = readTags(parser);
+                result = readFromTags(tags, parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final PhotoMetadata readFromTags(String[] tags, JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                if (tags != null) {
+                    assert tags.length >= 1;
+                    assert "photo".equals(tags[0]);
+                }
+                return readFields(parser);
+            }
+
+            public final PhotoMetadata readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Dimensions dimensions = null;
+                GpsCoordinates location = null;
+                java.util.Date timeTaken = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("dimensions".equals(fieldName)) {
+                        dimensions = Dimensions._reader
+                            .readField(parser, "dimensions", dimensions);
+                    }
+                    else if ("location".equals(fieldName)) {
+                        location = GpsCoordinates._reader
+                            .readField(parser, "location", location);
+                    }
+                    else if ("time_taken".equals(fieldName)) {
+                        timeTaken = JsonDateReader.DropboxV2
+                            .readField(parser, "time_taken", timeTaken);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                return new PhotoMetadata(dimensions, location, timeTaken);
+            }
+        };
+
+        public String toString() {
+            return "PhotoMetadata." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "PhotoMetadata." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static PhotoMetadata fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    /**
+     * Metadata for a video.
+     */
+    public static class VideoMetadata extends MediaMetadata  {
+        // struct VideoMetadata
+        /**
+         * The duration of the video in milliseconds.
+         */
+        public final Long duration;
+
+        public VideoMetadata(Dimensions dimensions, GpsCoordinates location, java.util.Date timeTaken, Long duration) {
+            super(dimensions, location, timeTaken);
+            this.duration = duration;
+        }
+        public JsonWriter getWriter() {
+            return VideoMetadata._writer;
+        }
+        static final JsonWriter<VideoMetadata> _writer = new JsonWriter<VideoMetadata>()
+        {
+            public final void write(VideoMetadata x, JsonGenerator g)
+             throws IOException
+            {
+                JsonWriter w = x.getWriter();
+                if (w != this) {
+                    w.write(x, g);
+                    return;
+                }
+                g.writeStartObject();
+                g.writeStringField(".tag", "video");
+                MediaMetadata._writer.writeFields(x, g);
+                VideoMetadata._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(VideoMetadata x, JsonGenerator g)
+             throws IOException
+            {
+                if (x.duration != null) {
+                    g.writeFieldName("duration");
+                    g.writeNumber(x.duration);
+                }
+            }
+        };
+
+        public static final JsonReader<VideoMetadata> _reader = new JsonReader<VideoMetadata>() {
+
+            public final VideoMetadata read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                VideoMetadata result;
+                JsonReader.expectObjectStart(parser);
+                String[] tags = readTags(parser);
+                result = readFromTags(tags, parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final VideoMetadata readFromTags(String[] tags, JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                if (tags != null) {
+                    assert tags.length >= 1;
+                    assert "video".equals(tags[0]);
+                }
+                return readFields(parser);
+            }
+
+            public final VideoMetadata readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Dimensions dimensions = null;
+                GpsCoordinates location = null;
+                java.util.Date timeTaken = null;
+                Long duration = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("dimensions".equals(fieldName)) {
+                        dimensions = Dimensions._reader
+                            .readField(parser, "dimensions", dimensions);
+                    }
+                    else if ("location".equals(fieldName)) {
+                        location = GpsCoordinates._reader
+                            .readField(parser, "location", location);
+                    }
+                    else if ("time_taken".equals(fieldName)) {
+                        timeTaken = JsonDateReader.DropboxV2
+                            .readField(parser, "time_taken", timeTaken);
+                    }
+                    else if ("duration".equals(fieldName)) {
+                        duration = JsonReader.UInt64Reader
+                            .readField(parser, "duration", duration);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                return new VideoMetadata(dimensions, location, timeTaken, duration);
+            }
+        };
+
+        public String toString() {
+            return "VideoMetadata." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "VideoMetadata." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static VideoMetadata fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+
+    public static final class MediaInfo {
+        // union MediaInfo
+
+        /**
+         * The discriminating tag type for {@link MediaInfo}.
+         */
+        public enum Tag {
+            pending,
+            metadata  // MediaMetadata
+        }
+
+        /**
+         * The discriminating tag for this instance.
+         */
+        public final Tag tag;
+
+        /**
+         * Indicate the photo/video is still under processing and metadata is
+         * not available yet.
+         */
+        public static final MediaInfo pending = new MediaInfo(Tag.pending);
+
+        private final MediaMetadata metadataValue;
+        private MediaInfo(Tag t, MediaMetadata v) {
+            tag = t;
+            metadataValue = v;
+            validate();
+        }
+        /**
+         * The metadata for the photo/video.
+         */
+        public static MediaInfo metadata(MediaMetadata v) {
+            return new MediaInfo(Tag.metadata, v);
+        }
+        public MediaMetadata getMetadata() {
+            if (tag != Tag.metadata) {
+                throw new RuntimeException("getMetadata() requires tag==metadata, actual tag=="+tag);
+            }
+            return metadataValue;
+        }
+
+        private MediaInfo(Tag t) {
+            tag = t;
+            metadataValue = null;
+            validate();
+        }
+
+        private void validate()
+        {
+            switch (tag) {
+                case pending:
+                    break;
+                case metadata:
+                    if (this.metadataValue == null) {
+                        throw new RuntimeException("Required value for 'metadata' is null");
+                    }
+                    break;
+            }
+        }
+        static final JsonWriter<MediaInfo> _writer = new JsonWriter<MediaInfo>()
+        {
+            public final void write(MediaInfo x, JsonGenerator g)
+              throws IOException
+            {
+                switch (x.tag) {
+                    case pending:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("pending");
+                        g.writeEndObject();
+                        break;
+                    case metadata:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("metadata");
+                        g.writeFieldName("metadata");
+                        MediaMetadata._writer.write(x.metadataValue, g);
+                        g.writeEndObject();
+                        break;
+                }
+            }
+        };
+        public static final JsonReader<MediaInfo> _reader = new JsonReader<MediaInfo>()
+        {
+            public final MediaInfo read(JsonParser parser)
+              throws IOException, JsonReadException
+            {
+                if (parser.getCurrentToken() == JsonToken.VALUE_STRING) {
+                    String text = parser.getText();
+                    parser.nextToken();
+                    Tag tag = _values.get(text);
+                    if (tag == null) {
+                        throw new JsonReadException("Unanticipated tag " + text + " without catch-all", parser.getTokenLocation());
+                    }
+                    switch (tag) {
+                        case pending: return MediaInfo.pending;
+                    }
+                    throw new JsonReadException("Tag " + tag + " requires a value", parser.getTokenLocation());
+                }
+                JsonReader.expectObjectStart(parser);
+                String[] tags = readTags(parser);
+                assert tags != null && tags.length == 1;
+                String text = tags[0];
+                Tag tag = _values.get(text);
+                MediaInfo value = null;
+                if (tag != null) {
+                    switch (tag) {
+                        case pending: {
+                            value = MediaInfo.pending;
+                            break;
+                        }
+                        case metadata: {
+                            MediaMetadata v = null;
+                            assert parser.getCurrentToken() == JsonToken.FIELD_NAME;
+                            text = parser.getText();
+                            assert tags[0].equals(text);
+                            parser.nextToken();
+                            v = MediaMetadata._reader
+                                .readField(parser, "metadata", v);
+                            value = MediaInfo.metadata(v);
+                            break;
+                        }
+                    }
+                }
+                if (value == null) {
+                    throw new JsonReadException("Unanticipated tag " + text, parser.getTokenLocation());
+                }
+                JsonReader.expectObjectEnd(parser);
+                return value;
+            }
+
+        };
+        private static final java.util.HashMap<String,Tag> _values;
+        static {
+            _values = new java.util.HashMap<String,Tag>();
+            _values.put("pending", Tag.pending);
+            _values.put("metadata", Tag.metadata);
+        }
+
+        public String toString() {
+            return "MediaInfo." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "MediaInfo." +  _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static MediaInfo fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
     public static class FileMetadata extends Metadata  {
         // struct FileMetadata
         /**
@@ -188,8 +870,12 @@ public final class Files {
          * The file size in bytes.
          */
         public final long size;
+        /**
+         * Additional information if the file is a photo or video.
+         */
+        public final MediaInfo mediaInfo;
 
-        public FileMetadata(String name, String pathLower, java.util.Date clientModified, java.util.Date serverModified, String rev, long size, String id) {
+        public FileMetadata(String name, String pathLower, java.util.Date clientModified, java.util.Date serverModified, String rev, long size, String id, MediaInfo mediaInfo) {
             super(name, pathLower);
             this.id = id;
             if (id != null) {
@@ -216,6 +902,9 @@ public final class Files {
                 throw new RuntimeException("String 'rev' does not match pattern");
             }
             this.size = size;
+            this.mediaInfo = mediaInfo;
+            if (mediaInfo != null) {
+            }
         }
         public JsonWriter getWriter() {
             return FileMetadata._writer;
@@ -249,6 +938,10 @@ public final class Files {
                 writeDateIso(x.serverModified, g);
                 g.writeStringField("rev", x.rev);
                 g.writeNumberField("size", x.size);
+                if (x.mediaInfo != null) {
+                    g.writeFieldName("media_info");
+                    MediaInfo._writer.write(x.mediaInfo, g);
+                }
             }
         };
 
@@ -285,6 +978,7 @@ public final class Files {
                 String rev = null;
                 Long size = null;
                 String id = null;
+                MediaInfo mediaInfo = null;
                 while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                     String fieldName = parser.getCurrentName();
                     parser.nextToken();
@@ -316,6 +1010,10 @@ public final class Files {
                         id = JsonReader.StringReader
                             .readField(parser, "id", id);
                     }
+                    else if ("media_info".equals(fieldName)) {
+                        mediaInfo = MediaInfo._reader
+                            .readField(parser, "media_info", mediaInfo);
+                    }
                     else { JsonReader.skipValue(parser); }
                 }
                 if (name == null) {
@@ -336,7 +1034,7 @@ public final class Files {
                 if (size == null) {
                     throw new JsonReadException("Required field \"size\" is missing.", parser.getTokenLocation());
                 }
-                return new FileMetadata(name, pathLower, clientModified, serverModified, rev, size, id);
+                return new FileMetadata(name, pathLower, clientModified, serverModified, rev, size, id, mediaInfo);
             }
         };
 
@@ -356,11 +1054,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Metadata (excluding name or path) for a folder. (There are currently no
-     * fields defined here, but we will add folder-specific metadata in the
-     * future.)
-     */
     public static class FolderMetadata extends Metadata  {
         // struct FolderMetadata
         /**
@@ -479,8 +1172,8 @@ public final class Files {
     }
 
     /**
-     * Indicates a deleted file or folder in results returned by {@link
-     * #listFolderContinue} or {@link #search}.
+     * Indicates that there used to be a file or folder at this path, but it no
+     * longer exists.
      */
     public static class DeletedMetadata extends Metadata  {
         // struct DeletedMetadata
@@ -580,9 +1273,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Error returned by {@link #getMetadata}.
-     */
 
     public static final class GetMetadataError {
         // union GetMetadataError
@@ -710,23 +1400,30 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #getMetadata}.
-     */
     public static class GetMetadataArg {
         // struct GetMetadataArg
         /**
-         * The path or ID of a file or folder on Dropbox
+         * The path of a file or folder on Dropbox
          */
         public final String path;
+        /**
+         * If true, :field:'FileMetadata.media_info' is set for photo and video.
+         */
+        public final boolean includeMediaInfo;
 
-        public GetMetadataArg(String path) {
+        public GetMetadataArg(String path, Boolean includeMediaInfo) {
             this.path = path;
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
             }
-            if (!java.util.regex.Pattern.matches("\\A(/|id:).*\\Z", path)) {
+            if (!java.util.regex.Pattern.matches("\\A((/|id:).*)|(rev:[0-9a-f]{9,})\\Z", path)) {
                 throw new RuntimeException("String 'path' does not match pattern");
+            }
+            if (includeMediaInfo != null) {
+                this.includeMediaInfo = includeMediaInfo.booleanValue();
+            }
+            else {
+                this.includeMediaInfo = false;
             }
         }
         static final JsonWriter<GetMetadataArg> _writer = new JsonWriter<GetMetadataArg>()
@@ -742,6 +1439,7 @@ public final class Files {
              throws IOException
             {
                 g.writeStringField("path", x.path);
+                g.writeBooleanField("include_media_info", x.includeMediaInfo);
             }
         };
 
@@ -761,6 +1459,7 @@ public final class Files {
                 throws IOException, JsonReadException
             {
                 String path = null;
+                Boolean includeMediaInfo = null;
                 while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                     String fieldName = parser.getCurrentName();
                     parser.nextToken();
@@ -768,12 +1467,16 @@ public final class Files {
                         path = JsonReader.StringReader
                             .readField(parser, "path", path);
                     }
+                    else if ("include_media_info".equals(fieldName)) {
+                        includeMediaInfo = JsonReader.BooleanReader
+                            .readField(parser, "include_media_info", includeMediaInfo);
+                    }
                     else { JsonReader.skipValue(parser); }
                 }
                 if (path == null) {
                     throw new JsonReadException("Required field \"path\" is missing.", parser.getTokenLocation());
                 }
-                return new GetMetadataArg(path);
+                return new GetMetadataArg(path, includeMediaInfo);
             }
         };
 
@@ -793,9 +1496,256 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #listFolder}.
-     */
+    public static class ListFolderLongpollArg {
+        // struct ListFolderLongpollArg
+        /**
+         * A cursor as returned by {@link #listFolder} or {@link
+         * #listFolderContinue}
+         */
+        public final String cursor;
+        /**
+         * A timeout in seconds. The request will block for at most this length
+         * of time, plus up to 90 seconds of random jitter added to avoid the
+         * thundering herd problem. Care should be taken when using this
+         * parameter, as some network infrastructure does not support long
+         * timeouts.
+         */
+        public final long timeout;
+
+        public ListFolderLongpollArg(String cursor, Long timeout) {
+            this.cursor = cursor;
+            if (cursor == null) {
+                throw new RuntimeException("Required value for 'cursor' is null");
+            }
+            if (timeout != null) {
+                this.timeout = timeout.longValue();
+            }
+            else {
+                this.timeout = 30L;
+            }
+            if (this.timeout < 30L) {
+                throw new RuntimeException("Number 'this.timeout' is smaller than 30L");
+            }
+            if (this.timeout > 480L) {
+                throw new RuntimeException("Number 'this.timeout' is larger than 480L");
+            }
+        }
+        static final JsonWriter<ListFolderLongpollArg> _writer = new JsonWriter<ListFolderLongpollArg>()
+        {
+            public final void write(ListFolderLongpollArg x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStartObject();
+                ListFolderLongpollArg._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(ListFolderLongpollArg x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStringField("cursor", x.cursor);
+                g.writeNumberField("timeout", x.timeout);
+            }
+        };
+
+        public static final JsonReader<ListFolderLongpollArg> _reader = new JsonReader<ListFolderLongpollArg>() {
+
+            public final ListFolderLongpollArg read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                ListFolderLongpollArg result;
+                JsonReader.expectObjectStart(parser);
+                result = readFields(parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final ListFolderLongpollArg readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                String cursor = null;
+                Long timeout = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("cursor".equals(fieldName)) {
+                        cursor = JsonReader.StringReader
+                            .readField(parser, "cursor", cursor);
+                    }
+                    else if ("timeout".equals(fieldName)) {
+                        timeout = JsonReader.UInt64Reader
+                            .readField(parser, "timeout", timeout);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                if (cursor == null) {
+                    throw new JsonReadException("Required field \"cursor\" is missing.", parser.getTokenLocation());
+                }
+                return new ListFolderLongpollArg(cursor, timeout);
+            }
+        };
+
+        public String toString() {
+            return "ListFolderLongpollArg." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "ListFolderLongpollArg." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static ListFolderLongpollArg fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    public static class ListFolderLongpollResult {
+        // struct ListFolderLongpollResult
+        /**
+         * Indicates whether new changes are available. If true, call {@link
+         * #listFolder} to retrieve the changes.
+         */
+        public final boolean changes;
+        /**
+         * If present, backoff for at least this many seconds before calling
+         * {@link #listFolderLongpoll} again.
+         */
+        public final Long backoff;
+
+        public ListFolderLongpollResult(boolean changes, Long backoff) {
+            this.changes = changes;
+            this.backoff = backoff;
+        }
+        static final JsonWriter<ListFolderLongpollResult> _writer = new JsonWriter<ListFolderLongpollResult>()
+        {
+            public final void write(ListFolderLongpollResult x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeStartObject();
+                ListFolderLongpollResult._writer.writeFields(x, g);
+                g.writeEndObject();
+            }
+            public final void writeFields(ListFolderLongpollResult x, JsonGenerator g)
+             throws IOException
+            {
+                g.writeBooleanField("changes", x.changes);
+                if (x.backoff != null) {
+                    g.writeFieldName("backoff");
+                    g.writeNumber(x.backoff);
+                }
+            }
+        };
+
+        public static final JsonReader<ListFolderLongpollResult> _reader = new JsonReader<ListFolderLongpollResult>() {
+
+            public final ListFolderLongpollResult read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                ListFolderLongpollResult result;
+                JsonReader.expectObjectStart(parser);
+                result = readFields(parser);
+                JsonReader.expectObjectEnd(parser);
+                return result;
+            }
+
+            public final ListFolderLongpollResult readFields(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                Boolean changes = null;
+                Long backoff = null;
+                while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                    String fieldName = parser.getCurrentName();
+                    parser.nextToken();
+                    if ("changes".equals(fieldName)) {
+                        changes = JsonReader.BooleanReader
+                            .readField(parser, "changes", changes);
+                    }
+                    else if ("backoff".equals(fieldName)) {
+                        backoff = JsonReader.UInt64Reader
+                            .readField(parser, "backoff", backoff);
+                    }
+                    else { JsonReader.skipValue(parser); }
+                }
+                if (changes == null) {
+                    throw new JsonReadException("Required field \"changes\" is missing.", parser.getTokenLocation());
+                }
+                return new ListFolderLongpollResult(changes, backoff);
+            }
+        };
+
+        public String toString() {
+            return "ListFolderLongpollResult." + _writer.writeToString(this, false);
+        }
+        public String toStringMultiline() {
+            return "ListFolderLongpollResult." + _writer.writeToString(this, true);
+        }
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static ListFolderLongpollResult fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
+    public enum ListFolderLongpollError {
+        // union ListFolderLongpollError
+        /**
+         * Indicates that the cursor has been invalidated. Call {@link
+         * #listFolder} to obtain a new cursor.
+         */
+        reset,
+        other;  // *catch_all
+
+        static final JsonWriter<ListFolderLongpollError> _writer = new JsonWriter<ListFolderLongpollError>()
+        {
+            public void write(ListFolderLongpollError x, JsonGenerator g)
+             throws IOException
+            {
+                switch (x) {
+                    case reset:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("reset");
+                        g.writeEndObject();
+                        break;
+                    case other:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("other");
+                        g.writeEndObject();
+                        break;
+                }
+            }
+        };
+
+        public static final JsonReader<ListFolderLongpollError> _reader = new JsonReader<ListFolderLongpollError>()
+        {
+            public final ListFolderLongpollError read(JsonParser parser)
+                throws IOException, JsonReadException
+            {
+                return JsonReader.readEnum(parser, _values, other);
+            }
+        };
+        private static final java.util.HashMap<String,ListFolderLongpollError> _values;
+        static {
+            _values = new java.util.HashMap<String,ListFolderLongpollError>();
+            _values.put("reset", reset);
+            _values.put("other", other);
+        }
+
+        public String toJson(Boolean longForm) {
+            return _writer.writeToString(this, longForm);
+        }
+        public static ListFolderLongpollError fromJson(String s)
+            throws JsonReadException
+        {
+            return _reader.readFully(s);
+        }
+    }
+
     public static class ListFolderArg {
         // struct ListFolderArg
         /**
@@ -803,12 +1753,16 @@ public final class Files {
          */
         public final String path;
         /**
-         * If true, list folder operation will be applied recursively to all
-         * subfolders. And the response will contain contents of all subfolders
+         * If true, the list folder operation will be applied recursively to all
+         * subfolders and the response will contain contents of all subfolders.
          */
         public final boolean recursive;
+        /**
+         * If true, :field:'FileMetadata.media_info' is set for photo and video.
+         */
+        public final boolean includeMediaInfo;
 
-        public ListFolderArg(String path, Boolean recursive) {
+        public ListFolderArg(String path, Boolean recursive, Boolean includeMediaInfo) {
             this.path = path;
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
@@ -821,6 +1775,12 @@ public final class Files {
             }
             else {
                 this.recursive = false;
+            }
+            if (includeMediaInfo != null) {
+                this.includeMediaInfo = includeMediaInfo.booleanValue();
+            }
+            else {
+                this.includeMediaInfo = false;
             }
         }
         static final JsonWriter<ListFolderArg> _writer = new JsonWriter<ListFolderArg>()
@@ -837,6 +1797,7 @@ public final class Files {
             {
                 g.writeStringField("path", x.path);
                 g.writeBooleanField("recursive", x.recursive);
+                g.writeBooleanField("include_media_info", x.includeMediaInfo);
             }
         };
 
@@ -857,6 +1818,7 @@ public final class Files {
             {
                 String path = null;
                 Boolean recursive = null;
+                Boolean includeMediaInfo = null;
                 while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                     String fieldName = parser.getCurrentName();
                     parser.nextToken();
@@ -868,12 +1830,16 @@ public final class Files {
                         recursive = JsonReader.BooleanReader
                             .readField(parser, "recursive", recursive);
                     }
+                    else if ("include_media_info".equals(fieldName)) {
+                        includeMediaInfo = JsonReader.BooleanReader
+                            .readField(parser, "include_media_info", includeMediaInfo);
+                    }
                     else { JsonReader.skipValue(parser); }
                 }
                 if (path == null) {
                     throw new JsonReadException("Required field \"path\" is missing.", parser.getTokenLocation());
                 }
-                return new ListFolderArg(path, recursive);
+                return new ListFolderArg(path, recursive, includeMediaInfo);
             }
         };
 
@@ -893,9 +1859,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Information returned by {@link #listFolder}.
-     */
     public static class ListFolderResult {
         // struct ListFolderResult
         /**
@@ -1018,9 +1981,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Error returned by {@link #listFolder} and {@link #listFolderContinue}.
-     */
 
     public static final class ListFolderError {
         // union ListFolderError
@@ -1169,14 +2129,11 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #listFolderContinue}.
-     */
     public static class ListFolderContinueArg {
         // struct ListFolderContinueArg
         /**
-         * The cursor returned by {@link #listFolder} or {@link
-         * #listFolderContinue}.
+         * The cursor returned by your last call to {@link #listFolder} or
+         * {@link #listFolderContinue}.
          */
         public final String cursor;
 
@@ -1250,9 +2207,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Error returned by {@link #listFolderContinue}.
-     */
 
     public static final class ListFolderContinueError {
         // union ListFolderContinueError
@@ -1418,9 +2372,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Information returned by {@link #listFolderGetLatestCursor}.
-     */
     public static class ListFolderGetLatestCursorResult {
         // struct ListFolderGetLatestCursorResult
         /**
@@ -1499,9 +2450,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors from {@link #download}.
-     */
 
     public static final class DownloadError {
         // union DownloadError
@@ -1650,9 +2598,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #download}.
-     */
     public static class DownloadArg {
         // struct DownloadArg
         /**
@@ -1660,8 +2605,7 @@ public final class Files {
          */
         public final String path;
         /**
-         * Optional revision, taken from the corresponding {@link Metadata}
-         * field.
+         * Deprecated. Please specify revision in :field:'path' instead
          */
         public final String rev;
 
@@ -1670,7 +2614,7 @@ public final class Files {
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
             }
-            if (!java.util.regex.Pattern.matches("\\A/.*\\Z", path)) {
+            if (!java.util.regex.Pattern.matches("\\A((/|id:).*)|(rev:[0-9a-f]{9,})\\Z", path)) {
                 throw new RuntimeException("String 'path' does not match pattern");
             }
             this.rev = rev;
@@ -1851,9 +2795,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors for upload.
-     */
 
     public static final class UploadError {
         // union UploadError
@@ -1999,9 +2940,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Error structure for recovering the correct upload offset.
-     */
     public static class UploadSessionOffsetError {
         // struct UploadSessionOffsetError
         /**
@@ -2076,9 +3014,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors related to upload sessions.
-     */
 
     public static final class UploadSessionLookupError {
         // union UploadSessionLookupError
@@ -2266,9 +3201,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors for {@link #uploadSessionFinish}.
-     */
 
     public static final class UploadSessionFinishError {
         // union UploadSessionFinishError
@@ -2468,9 +3400,6 @@ public final class Files {
         }
     }
 
-    /**
-     * The result of {@link #uploadSessionStart}.
-     */
     public static class UploadSessionStartResult {
         // struct UploadSessionStartResult
         /**
@@ -2549,10 +3478,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #uploadSessionAppend}. Also used by {@link
-     * #uploadSessionFinish}.
-     */
     public static class UploadSessionCursor {
         // struct UploadSessionCursor
         /**
@@ -2676,15 +3601,15 @@ public final class Files {
         public final Tag tag;
 
         /**
-         * It's always a conflict. The autorename strategy is to append a number
-         * to the file name. For example "document.txt" might become "document
-         * (2).txt".
+         * Never overwrite the existing file. The autorename strategy is to
+         * append a number to the file name. For example, "document.txt" might
+         * become "document (2).txt".
          */
         public static final WriteMode add = new WriteMode(Tag.add);
 
         /**
-         * It's never a conflict. Overwrite the existing file. The autorename
-         * strategy is the same as it is for {@code add}.
+         * Always overwrite the existing file. The autorename strategy is the
+         * same as it is for {@code add}.
          */
         public static final WriteMode overwrite = new WriteMode(Tag.overwrite);
 
@@ -2695,11 +3620,10 @@ public final class Files {
             validate();
         }
         /**
-         * It's a conflict only if the current "rev" doesn't match the given
-         * "rev". The autorename strategy is to append the string "conflicted
-         * copy" to the file name. For example, "document.txt" might become
-         * "document (conflicted copy).txt" or "document (Panda's conflicted
-         * copy).txt".
+         * Overwrite if the given "rev" matches the existing file's "rev". The
+         * autorename strategy is to append the string "conflicted copy" to the
+         * file name. For example, "document.txt" might become "document
+         * (conflicted copy).txt" or "document (Panda's conflicted copy).txt".
          */
         public static WriteMode update(String v) {
             return new WriteMode(Tag.update, v);
@@ -2843,10 +3767,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #upload}. Also part of the arguments to {@link
-     * #uploadSessionFinish}.
-     */
     public static class CommitInfo {
         // struct CommitInfo
         /**
@@ -2998,9 +3918,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #uploadSessionFinish}.
-     */
     public static class UploadSessionFinishArg {
         // struct UploadSessionFinishArg
         /**
@@ -3097,9 +4014,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Select which type of data to search.
-     */
     public enum SearchMode {
         // union SearchMode
         /**
@@ -3169,11 +4083,8 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #search}.
-     */
-    public static class SearchQuery {
-        // struct SearchQuery
+    public static class SearchArg {
+        // struct SearchArg
         /**
          * The path in the user's Dropbox to search. Should probably be a
          * folder.
@@ -3200,7 +4111,7 @@ public final class Files {
          */
         public final SearchMode mode;
 
-        public SearchQuery(String path, String query, Long start, Long maxResults, SearchMode mode) {
+        public SearchArg(String path, String query, Long start, Long maxResults, SearchMode mode) {
             this.path = path;
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
@@ -3237,16 +4148,16 @@ public final class Files {
                 this.mode = SearchMode.filename;
             }
         }
-        static final JsonWriter<SearchQuery> _writer = new JsonWriter<SearchQuery>()
+        static final JsonWriter<SearchArg> _writer = new JsonWriter<SearchArg>()
         {
-            public final void write(SearchQuery x, JsonGenerator g)
+            public final void write(SearchArg x, JsonGenerator g)
              throws IOException
             {
                 g.writeStartObject();
-                SearchQuery._writer.writeFields(x, g);
+                SearchArg._writer.writeFields(x, g);
                 g.writeEndObject();
             }
-            public final void writeFields(SearchQuery x, JsonGenerator g)
+            public final void writeFields(SearchArg x, JsonGenerator g)
              throws IOException
             {
                 g.writeStringField("path", x.path);
@@ -3258,19 +4169,19 @@ public final class Files {
             }
         };
 
-        public static final JsonReader<SearchQuery> _reader = new JsonReader<SearchQuery>() {
+        public static final JsonReader<SearchArg> _reader = new JsonReader<SearchArg>() {
 
-            public final SearchQuery read(JsonParser parser)
+            public final SearchArg read(JsonParser parser)
                 throws IOException, JsonReadException
             {
-                SearchQuery result;
+                SearchArg result;
                 JsonReader.expectObjectStart(parser);
                 result = readFields(parser);
                 JsonReader.expectObjectEnd(parser);
                 return result;
             }
 
-            public final SearchQuery readFields(JsonParser parser)
+            public final SearchArg readFields(JsonParser parser)
                 throws IOException, JsonReadException
             {
                 String path = null;
@@ -3309,20 +4220,20 @@ public final class Files {
                 if (query == null) {
                     throw new JsonReadException("Required field \"query\" is missing.", parser.getTokenLocation());
                 }
-                return new SearchQuery(path, query, start, maxResults, mode);
+                return new SearchArg(path, query, start, maxResults, mode);
             }
         };
 
         public String toString() {
-            return "SearchQuery." + _writer.writeToString(this, false);
+            return "SearchArg." + _writer.writeToString(this, false);
         }
         public String toStringMultiline() {
-            return "SearchQuery." + _writer.writeToString(this, true);
+            return "SearchArg." + _writer.writeToString(this, true);
         }
         public String toJson(Boolean longForm) {
             return _writer.writeToString(this, longForm);
         }
-        public static SearchQuery fromJson(String s)
+        public static SearchArg fromJson(String s)
             throws JsonReadException
         {
             return _reader.readFully(s);
@@ -3401,9 +4312,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Describes a search result.
-     */
     public static class SearchMatch {
         // struct SearchMatch
         /**
@@ -3500,11 +4408,8 @@ public final class Files {
         }
     }
 
-    /**
-     * Information returned by {@link #search}.
-     */
-    public static class SearchResults {
-        // struct SearchResults
+    public static class SearchResult {
+        // struct SearchResult
         /**
          * A list (possibly empty) of matches for the query.
          */
@@ -3520,7 +4425,7 @@ public final class Files {
          */
         public final long start;
 
-        public SearchResults(java.util.ArrayList<SearchMatch> matches, boolean more, long start) {
+        public SearchResult(java.util.ArrayList<SearchMatch> matches, boolean more, long start) {
             this.matches = matches;
             if (matches == null) {
                 throw new RuntimeException("Required value for 'matches' is null");
@@ -3533,16 +4438,16 @@ public final class Files {
             this.more = more;
             this.start = start;
         }
-        static final JsonWriter<SearchResults> _writer = new JsonWriter<SearchResults>()
+        static final JsonWriter<SearchResult> _writer = new JsonWriter<SearchResult>()
         {
-            public final void write(SearchResults x, JsonGenerator g)
+            public final void write(SearchResult x, JsonGenerator g)
              throws IOException
             {
                 g.writeStartObject();
-                SearchResults._writer.writeFields(x, g);
+                SearchResult._writer.writeFields(x, g);
                 g.writeEndObject();
             }
-            public final void writeFields(SearchResults x, JsonGenerator g)
+            public final void writeFields(SearchResult x, JsonGenerator g)
              throws IOException
             {
                 g.writeFieldName("matches");
@@ -3558,19 +4463,19 @@ public final class Files {
             }
         };
 
-        public static final JsonReader<SearchResults> _reader = new JsonReader<SearchResults>() {
+        public static final JsonReader<SearchResult> _reader = new JsonReader<SearchResult>() {
 
-            public final SearchResults read(JsonParser parser)
+            public final SearchResult read(JsonParser parser)
                 throws IOException, JsonReadException
             {
-                SearchResults result;
+                SearchResult result;
                 JsonReader.expectObjectStart(parser);
                 result = readFields(parser);
                 JsonReader.expectObjectEnd(parser);
                 return result;
             }
 
-            public final SearchResults readFields(JsonParser parser)
+            public final SearchResult readFields(JsonParser parser)
                 throws IOException, JsonReadException
             {
                 java.util.ArrayList<SearchMatch> matches = null;
@@ -3602,29 +4507,26 @@ public final class Files {
                 if (start == null) {
                     throw new JsonReadException("Required field \"start\" is missing.", parser.getTokenLocation());
                 }
-                return new SearchResults(matches, more, start);
+                return new SearchResult(matches, more, start);
             }
         };
 
         public String toString() {
-            return "SearchResults." + _writer.writeToString(this, false);
+            return "SearchResult." + _writer.writeToString(this, false);
         }
         public String toStringMultiline() {
-            return "SearchResults." + _writer.writeToString(this, true);
+            return "SearchResult." + _writer.writeToString(this, true);
         }
         public String toJson(Boolean longForm) {
             return _writer.writeToString(this, longForm);
         }
-        public static SearchResults fromJson(String s)
+        public static SearchResult fromJson(String s)
             throws JsonReadException
         {
             return _reader.readFully(s);
         }
     }
 
-    /**
-     * Errors for {@link #search}.
-     */
 
     public static final class SearchError {
         // union SearchError
@@ -4334,9 +5236,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #createFolder}.
-     */
     public static class CreateFolderArg {
         // struct CreateFolderArg
         /**
@@ -4544,9 +5443,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #delete}.
-     */
     public static class DeleteArg {
         // struct DeleteArg
         /**
@@ -4817,9 +5713,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #copy} and {@link #move}.
-     */
     public static class RelocationArg {
         // struct RelocationArg
         /**
@@ -4920,9 +5813,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors reported by {@link #copy} and {@link #move}.
-     */
 
     public static final class RelocationError {
         // union RelocationError
@@ -5211,31 +6101,28 @@ public final class Files {
         }
     }
 
-    /**
-     * The size option for thumbnail image.
-     */
     public enum ThumbnailSize {
         // union ThumbnailSize
         /**
          * 32 by 32 px.
          */
-        xs,
+        w32h32,
         /**
          * 64 by 64 px.
          */
-        s,
+        w64h64,
         /**
          * 128 by 128 px.
          */
-        m,
+        w128h128,
         /**
          * 640 by 480 px.
          */
-        l,
+        w640h480,
         /**
          * 1024 by 768
          */
-        xl;
+        w1024h768;
 
         static final JsonWriter<ThumbnailSize> _writer = new JsonWriter<ThumbnailSize>()
         {
@@ -5243,34 +6130,34 @@ public final class Files {
              throws IOException
             {
                 switch (x) {
-                    case xs:
+                    case w32h32:
                         g.writeStartObject();
                         g.writeFieldName(".tag");
-                        g.writeString("xs");
+                        g.writeString("w32h32");
                         g.writeEndObject();
                         break;
-                    case s:
+                    case w64h64:
                         g.writeStartObject();
                         g.writeFieldName(".tag");
-                        g.writeString("s");
+                        g.writeString("w64h64");
                         g.writeEndObject();
                         break;
-                    case m:
+                    case w128h128:
                         g.writeStartObject();
                         g.writeFieldName(".tag");
-                        g.writeString("m");
+                        g.writeString("w128h128");
                         g.writeEndObject();
                         break;
-                    case l:
+                    case w640h480:
                         g.writeStartObject();
                         g.writeFieldName(".tag");
-                        g.writeString("l");
+                        g.writeString("w640h480");
                         g.writeEndObject();
                         break;
-                    case xl:
+                    case w1024h768:
                         g.writeStartObject();
                         g.writeFieldName(".tag");
-                        g.writeString("xl");
+                        g.writeString("w1024h768");
                         g.writeEndObject();
                         break;
                 }
@@ -5288,11 +6175,11 @@ public final class Files {
         private static final java.util.HashMap<String,ThumbnailSize> _values;
         static {
             _values = new java.util.HashMap<String,ThumbnailSize>();
-            _values.put("xs", xs);
-            _values.put("s", s);
-            _values.put("m", m);
-            _values.put("l", l);
-            _values.put("xl", xl);
+            _values.put("w32h32", w32h32);
+            _values.put("w64h64", w64h64);
+            _values.put("w128h128", w128h128);
+            _values.put("w640h480", w640h480);
+            _values.put("w1024h768", w1024h768);
         }
 
         public String toJson(Boolean longForm) {
@@ -5305,9 +6192,6 @@ public final class Files {
         }
     }
 
-    /**
-     * The format option for thumbnail image.
-     */
     public enum ThumbnailFormat {
         // union ThumbnailFormat
         jpeg,
@@ -5360,12 +6244,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #getThumbnail}. This method currently supports files
-     * with the following file extensions: jpg, jpeg, png, tiff, tif, gif and
-     * bmp. Photos that are larger than 20MB in size won't be converted to a
-     * thumbnail.
-     */
     public static class ThumbnailArg {
         // struct ThumbnailArg
         /**
@@ -5379,7 +6257,7 @@ public final class Files {
          */
         public final ThumbnailFormat format;
         /**
-         * The size for the thumbnail image (default s).
+         * The size for the thumbnail image.
          */
         public final ThumbnailSize size;
 
@@ -5388,7 +6266,7 @@ public final class Files {
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
             }
-            if (!java.util.regex.Pattern.matches("\\A/.*\\Z", path)) {
+            if (!java.util.regex.Pattern.matches("\\A((/|id:).*)|(rev:[0-9a-f]{9,})\\Z", path)) {
                 throw new RuntimeException("String 'path' does not match pattern");
             }
             if (format != null) {
@@ -5401,7 +6279,7 @@ public final class Files {
                 this.size = size;
             }
             else {
-                this.size = ThumbnailSize.s;
+                this.size = ThumbnailSize.w64h64;
             }
         }
         static final JsonWriter<ThumbnailArg> _writer = new JsonWriter<ThumbnailArg>()
@@ -5482,9 +6360,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors reported by {@link #getThumbnail}.
-     */
 
     public static final class ThumbnailError {
         // union ThumbnailError
@@ -5495,8 +6370,6 @@ public final class Files {
         public enum Tag {
             path,  // LookupError
             unsupportedExtension,
-            unsupportedFormat,
-            unsupportedSize,
             unsupportedImage,
             conversionError
         }
@@ -5531,16 +6404,6 @@ public final class Files {
         public static final ThumbnailError unsupportedExtension = new ThumbnailError(Tag.unsupportedExtension);
 
         /**
-         * The thumbnail format specified is not supported.
-         */
-        public static final ThumbnailError unsupportedFormat = new ThumbnailError(Tag.unsupportedFormat);
-
-        /**
-         * The size value specified is not supported.
-         */
-        public static final ThumbnailError unsupportedSize = new ThumbnailError(Tag.unsupportedSize);
-
-        /**
          * The image cannot be converted to a thumbnail.
          */
         public static final ThumbnailError unsupportedImage = new ThumbnailError(Tag.unsupportedImage);
@@ -5560,8 +6423,6 @@ public final class Files {
         {
             switch (tag) {
                 case unsupportedExtension:
-                case unsupportedFormat:
-                case unsupportedSize:
                 case unsupportedImage:
                 case conversionError:
                     break;
@@ -5590,18 +6451,6 @@ public final class Files {
                         g.writeStartObject();
                         g.writeFieldName(".tag");
                         g.writeString("unsupported_extension");
-                        g.writeEndObject();
-                        break;
-                    case unsupportedFormat:
-                        g.writeStartObject();
-                        g.writeFieldName(".tag");
-                        g.writeString("unsupported_format");
-                        g.writeEndObject();
-                        break;
-                    case unsupportedSize:
-                        g.writeStartObject();
-                        g.writeFieldName(".tag");
-                        g.writeString("unsupported_size");
                         g.writeEndObject();
                         break;
                     case unsupportedImage:
@@ -5633,8 +6482,6 @@ public final class Files {
                     }
                     switch (tag) {
                         case unsupportedExtension: return ThumbnailError.unsupportedExtension;
-                        case unsupportedFormat: return ThumbnailError.unsupportedFormat;
-                        case unsupportedSize: return ThumbnailError.unsupportedSize;
                         case unsupportedImage: return ThumbnailError.unsupportedImage;
                         case conversionError: return ThumbnailError.conversionError;
                     }
@@ -5663,14 +6510,6 @@ public final class Files {
                             value = ThumbnailError.unsupportedExtension;
                             break;
                         }
-                        case unsupportedFormat: {
-                            value = ThumbnailError.unsupportedFormat;
-                            break;
-                        }
-                        case unsupportedSize: {
-                            value = ThumbnailError.unsupportedSize;
-                            break;
-                        }
                         case unsupportedImage: {
                             value = ThumbnailError.unsupportedImage;
                             break;
@@ -5694,8 +6533,6 @@ public final class Files {
             _values = new java.util.HashMap<String,Tag>();
             _values.put("path", Tag.path);
             _values.put("unsupported_extension", Tag.unsupportedExtension);
-            _values.put("unsupported_format", Tag.unsupportedFormat);
-            _values.put("unsupported_size", Tag.unsupportedSize);
             _values.put("unsupported_image", Tag.unsupportedImage);
             _values.put("conversion_error", Tag.conversionError);
         }
@@ -5716,9 +6553,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #getPreview}.
-     */
     public static class PreviewArg {
         // struct PreviewArg
         /**
@@ -5726,8 +6560,7 @@ public final class Files {
          */
         public final String path;
         /**
-         * Optional revision, taken from the corresponding {@link Metadata}
-         * field.
+         * Deprecated. Please specify revision in :field:'path' instead
          */
         public final String rev;
 
@@ -5736,7 +6569,7 @@ public final class Files {
             if (path == null) {
                 throw new RuntimeException("Required value for 'path' is null");
             }
-            if (!java.util.regex.Pattern.matches("\\A/.*\\Z", path)) {
+            if (!java.util.regex.Pattern.matches("\\A((/|id:).*)|(rev:[0-9a-f]{9,})\\Z", path)) {
                 throw new RuntimeException("String 'path' does not match pattern");
             }
             this.rev = rev;
@@ -5822,9 +6655,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors reported by {@link #getPreview}.
-     */
 
     public static final class PreviewError {
         // union PreviewError
@@ -6019,9 +6849,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #listRevisions}.
-     */
     public static class ListRevisionsArg {
         // struct ListRevisionsArg
         /**
@@ -6124,9 +6951,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors reported by {@link #listRevisions}.
-     */
 
     public static final class ListRevisionsError {
         // union ListRevisionsError
@@ -6135,7 +6959,8 @@ public final class Files {
          * The discriminating tag type for {@link ListRevisionsError}.
          */
         public enum Tag {
-            path  // LookupError
+            path,  // LookupError
+            other  // *catch_all
         }
 
         /**
@@ -6159,10 +6984,19 @@ public final class Files {
             return pathValue;
         }
 
+        public static final ListRevisionsError other = new ListRevisionsError(Tag.other);
+
+        private ListRevisionsError(Tag t) {
+            tag = t;
+            pathValue = null;
+            validate();
+        }
 
         private void validate()
         {
             switch (tag) {
+                case other:
+                    break;
                 case path:
                     if (this.pathValue == null) {
                         throw new RuntimeException("Required value for 'path' is null");
@@ -6184,6 +7018,12 @@ public final class Files {
                         LookupError._writer.write(x.pathValue, g);
                         g.writeEndObject();
                         break;
+                    case other:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("other");
+                        g.writeEndObject();
+                        break;
                 }
             }
         };
@@ -6196,10 +7036,9 @@ public final class Files {
                     String text = parser.getText();
                     parser.nextToken();
                     Tag tag = _values.get(text);
-                    if (tag == null) {
-                        throw new JsonReadException("Unanticipated tag " + text + " without catch-all", parser.getTokenLocation());
-                    }
+                    if (tag == null) { return ListRevisionsError.other; }
                     switch (tag) {
+                        case other: return ListRevisionsError.other;
                     }
                     throw new JsonReadException("Tag " + tag + " requires a value", parser.getTokenLocation());
                 }
@@ -6222,12 +7061,14 @@ public final class Files {
                             value = ListRevisionsError.path(v);
                             break;
                         }
+                        case other: {
+                            value = ListRevisionsError.other;
+                            break;
+                        }
                     }
                 }
-                if (value == null) {
-                    throw new JsonReadException("Unanticipated tag " + text, parser.getTokenLocation());
-                }
                 JsonReader.expectObjectEnd(parser);
+                if (value == null) { return ListRevisionsError.other; }
                 return value;
             }
 
@@ -6236,6 +7077,7 @@ public final class Files {
         static {
             _values = new java.util.HashMap<String,Tag>();
             _values.put("path", Tag.path);
+            _values.put("other", Tag.other);
         }
 
         public String toString() {
@@ -6254,9 +7096,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Information returned by {@link #listRevisions}.
-     */
     public static class ListRevisionsResult {
         // struct ListRevisionsResult
         /**
@@ -6361,9 +7200,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Arguments for {@link #restore}.
-     */
     public static class RestoreArg {
         // struct RestoreArg
         /**
@@ -6467,9 +7303,6 @@ public final class Files {
         }
     }
 
-    /**
-     * Errors reported by {@link #restore}.
-     */
 
     public static final class RestoreError {
         // union RestoreError
@@ -6480,7 +7313,8 @@ public final class Files {
         public enum Tag {
             pathLookup,  // LookupError
             pathWrite,  // WriteError
-            invalidRevision
+            invalidRevision,
+            other  // *catch_all
         }
 
         /**
@@ -6533,6 +7367,8 @@ public final class Files {
          */
         public static final RestoreError invalidRevision = new RestoreError(Tag.invalidRevision);
 
+        public static final RestoreError other = new RestoreError(Tag.other);
+
         private RestoreError(Tag t) {
             tag = t;
             pathLookupValue = null;
@@ -6544,6 +7380,7 @@ public final class Files {
         {
             switch (tag) {
                 case invalidRevision:
+                case other:
                     break;
                 case pathLookup:
                     if (this.pathLookupValue == null) {
@@ -6585,6 +7422,12 @@ public final class Files {
                         g.writeString("invalid_revision");
                         g.writeEndObject();
                         break;
+                    case other:
+                        g.writeStartObject();
+                        g.writeFieldName(".tag");
+                        g.writeString("other");
+                        g.writeEndObject();
+                        break;
                 }
             }
         };
@@ -6597,11 +7440,10 @@ public final class Files {
                     String text = parser.getText();
                     parser.nextToken();
                     Tag tag = _values.get(text);
-                    if (tag == null) {
-                        throw new JsonReadException("Unanticipated tag " + text + " without catch-all", parser.getTokenLocation());
-                    }
+                    if (tag == null) { return RestoreError.other; }
                     switch (tag) {
                         case invalidRevision: return RestoreError.invalidRevision;
+                        case other: return RestoreError.other;
                     }
                     throw new JsonReadException("Tag " + tag + " requires a value", parser.getTokenLocation());
                 }
@@ -6639,12 +7481,14 @@ public final class Files {
                             value = RestoreError.invalidRevision;
                             break;
                         }
+                        case other: {
+                            value = RestoreError.other;
+                            break;
+                        }
                     }
                 }
-                if (value == null) {
-                    throw new JsonReadException("Unanticipated tag " + text, parser.getTokenLocation());
-                }
                 JsonReader.expectObjectEnd(parser);
+                if (value == null) { return RestoreError.other; }
                 return value;
             }
 
@@ -6655,6 +7499,7 @@ public final class Files {
             _values.put("path_lookup", Tag.pathLookup);
             _values.put("path_write", Tag.pathWrite);
             _values.put("invalid_revision", Tag.invalidRevision);
+            _values.put("other", Tag.other);
         }
 
         public String toString() {
@@ -6713,8 +7558,79 @@ public final class Files {
     public Metadata getMetadata(String path)
           throws GetMetadataException, DbxException
     {
-        GetMetadataArg arg = new GetMetadataArg(path);
+        GetMetadataArg arg = new GetMetadataArg(path, null);
         return getMetadata(arg);
+    }
+    /**
+     * Returns the metadata for a file or folder.
+     */
+    public Metadata getMetadata(String path, boolean includeMediaInfo)
+          throws GetMetadataException, DbxException
+    {
+        GetMetadataArg arg = new GetMetadataArg(path, includeMediaInfo);
+        return getMetadata(arg);
+    }
+
+    /**
+     * Exception thrown by {@link #listFolderLongpoll}.
+     */
+    public static class ListFolderLongpollException extends DbxApiException {
+        /**
+         * The error reported by listFolderLongpoll.
+         */
+        public final ListFolderLongpollError errorValue;
+
+        public ListFolderLongpollException(ListFolderLongpollError errorValue) {
+            super("Exception in list_folder/longpoll: " + errorValue);
+            this.errorValue = errorValue;
+        }
+    }
+    /**
+     * A longpoll endpoint to wait for changes on an account. In conjunction
+     * with {@link #listFolder}, this call gives you a low-latency way to
+     * monitor an account for file changes. The connection will block until
+     * there are changes available or a timeout occurs.
+     */
+    private ListFolderLongpollResult listFolderLongpoll(ListFolderLongpollArg arg)
+            throws ListFolderLongpollException, DbxException
+    {
+        try {
+            return DbxRawClientV2.rpcStyle(client.getRequestConfig(),
+                                           client.getAccessToken(),
+                                           client.getHost().notify,
+                                           "2-beta-2/files/list_folder/longpoll",
+                                           arg,
+                                           ListFolderLongpollArg._writer,
+                                           ListFolderLongpollResult._reader,
+                                           ListFolderLongpollError._reader);
+        }
+        catch (DbxRequestUtil.ErrorWrapper ew) {
+            throw new ListFolderLongpollException((ListFolderLongpollError) (ew.errValue));
+        }
+    }
+    /**
+     * A longpoll endpoint to wait for changes on an account. In conjunction
+     * with {@link #listFolder}, this call gives you a low-latency way to
+     * monitor an account for file changes. The connection will block until
+     * there are changes available or a timeout occurs.
+     */
+    public ListFolderLongpollResult listFolderLongpoll(String cursor)
+          throws ListFolderLongpollException, DbxException
+    {
+        ListFolderLongpollArg arg = new ListFolderLongpollArg(cursor, null);
+        return listFolderLongpoll(arg);
+    }
+    /**
+     * A longpoll endpoint to wait for changes on an account. In conjunction
+     * with {@link #listFolder}, this call gives you a low-latency way to
+     * monitor an account for file changes. The connection will block until
+     * there are changes available or a timeout occurs.
+     */
+    public ListFolderLongpollResult listFolderLongpoll(String cursor, long timeout)
+          throws ListFolderLongpollException, DbxException
+    {
+        ListFolderLongpollArg arg = new ListFolderLongpollArg(cursor, timeout);
+        return listFolderLongpoll(arg);
     }
 
     /**
@@ -6732,8 +7648,7 @@ public final class Files {
         }
     }
     /**
-     * Returns the contents of a folder. NOTE: We're definitely going to
-     * streamline this interface.
+     * Returns the contents of a folder.
      */
     private ListFolderResult listFolder(ListFolderArg arg)
             throws ListFolderException, DbxException
@@ -6753,24 +7668,48 @@ public final class Files {
         }
     }
     /**
-     * Returns the contents of a folder. NOTE: We're definitely going to
-     * streamline this interface.
+     * Returns the contents of a folder.
      */
     public ListFolderResult listFolder(String path)
           throws ListFolderException, DbxException
     {
-        ListFolderArg arg = new ListFolderArg(path, null);
+        ListFolderArg arg = new ListFolderArg(path, null, null);
         return listFolder(arg);
     }
     /**
-     * Returns the contents of a folder. NOTE: We're definitely going to
-     * streamline this interface.
+     * The builder object returned by {@link #listFolderBuilder}
      */
-    public ListFolderResult listFolder(String path, boolean recursive)
-          throws ListFolderException, DbxException
+    public final class ListFolderBuilder
     {
-        ListFolderArg arg = new ListFolderArg(path, recursive);
-        return listFolder(arg);
+        private String path;
+        private Boolean recursive;
+        private Boolean includeMediaInfo;
+        private ListFolderBuilder(String path)
+        {
+            this.path = path;
+        }
+        public ListFolderBuilder recursive(boolean recursive)
+        {
+            this.recursive = recursive;
+            return this;
+        }
+        public ListFolderBuilder includeMediaInfo(boolean includeMediaInfo)
+        {
+            this.includeMediaInfo = includeMediaInfo;
+            return this;
+        }
+        public ListFolderResult start() throws ListFolderException, DbxException
+        {
+            ListFolderArg arg = new ListFolderArg(path, recursive, includeMediaInfo);
+            return DbxFiles.this.listFolder(arg);
+        }
+    }
+    /**
+     * Returns the contents of a folder.
+     */
+    public ListFolderBuilder listFolderBuilder(String path)
+    {
+        return new ListFolderBuilder(path);
     }
 
     /**
@@ -6789,8 +7728,7 @@ public final class Files {
     }
     /**
      * Once a cursor has been retrieved from {@link #listFolder}, use this to
-     * paginate through all files and retrieve updates to the folder. NOTE:
-     * We're definitely going to streamline this interface.
+     * paginate through all files and retrieve updates to the folder.
      */
     private ListFolderResult listFolderContinue(ListFolderContinueArg arg)
             throws ListFolderContinueException, DbxException
@@ -6811,8 +7749,7 @@ public final class Files {
     }
     /**
      * Once a cursor has been retrieved from {@link #listFolder}, use this to
-     * paginate through all files and retrieve updates to the folder. NOTE:
-     * We're definitely going to streamline this interface.
+     * paginate through all files and retrieve updates to the folder.
      */
     public ListFolderResult listFolderContinue(String cursor)
           throws ListFolderContinueException, DbxException
@@ -6869,8 +7806,36 @@ public final class Files {
     public ListFolderGetLatestCursorResult listFolderGetLatestCursor(String path)
           throws ListFolderGetLatestCursorException, DbxException
     {
-        ListFolderArg arg = new ListFolderArg(path, null);
+        ListFolderArg arg = new ListFolderArg(path, null, null);
         return listFolderGetLatestCursor(arg);
+    }
+    /**
+     * The builder object returned by {@link #listFolderGetLatestCursorBuilder}
+     */
+    public final class ListFolderGetLatestCursorBuilder
+    {
+        private String path;
+        private Boolean recursive;
+        private Boolean includeMediaInfo;
+        private ListFolderGetLatestCursorBuilder(String path)
+        {
+            this.path = path;
+        }
+        public ListFolderGetLatestCursorBuilder recursive(boolean recursive)
+        {
+            this.recursive = recursive;
+            return this;
+        }
+        public ListFolderGetLatestCursorBuilder includeMediaInfo(boolean includeMediaInfo)
+        {
+            this.includeMediaInfo = includeMediaInfo;
+            return this;
+        }
+        public ListFolderGetLatestCursorResult start() throws ListFolderGetLatestCursorException, DbxException
+        {
+            ListFolderArg arg = new ListFolderArg(path, recursive, includeMediaInfo);
+            return DbxFiles.this.listFolderGetLatestCursor(arg);
+        }
     }
     /**
      * A way to quickly get a cursor for the folder's state. Unlike {@link
@@ -6879,11 +7844,9 @@ public final class Files {
      * files and modifications and doesn't need to know about files that already
      * exist in Dropbox.
      */
-    public ListFolderGetLatestCursorResult listFolderGetLatestCursor(String path, boolean recursive)
-          throws ListFolderGetLatestCursorException, DbxException
+    public ListFolderGetLatestCursorBuilder listFolderGetLatestCursorBuilder(String path)
     {
-        ListFolderArg arg = new ListFolderArg(path, recursive);
-        return listFolderGetLatestCursor(arg);
+        return new ListFolderGetLatestCursorBuilder(path);
     }
 
     /**
@@ -6922,7 +7885,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxDownloadStyleBuilder} returned by
-     * {@link #DownloadBuilder}.
+     * {@link #downloadBuilder}.
      */
     public final class DownloadBuilder extends DbxDownloadStyleBuilder<FileMetadata>
     {
@@ -6940,7 +7903,7 @@ public final class Files {
         public com.dropbox.core.DbxDownloader<FileMetadata> start() throws DownloadException, DbxException
         {
             DownloadArg arg = new DownloadArg(path, rev);
-            return Files.this.download(arg);
+            return DbxFiles.this.download(arg);
         }
     }
     /**
@@ -6983,8 +7946,10 @@ public final class Files {
         }
     };
     /**
-     * Start a new upload session. This is used to upload a single file with
-     * multiple calls.
+     * Upload sessions allow you to upload a single file using multiple
+     * requests. This call starts a new upload session with the given data.  You
+     * can then use {@link #uploadSessionAppend} to add more data and {@link
+     * #uploadSessionFinish} to save all the data to a file in Dropbox.
      */
     public UploadSessionStartUploader uploadSessionStart()
             throws DbxException
@@ -7057,7 +8022,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxUploadStyleBuilder} returned by {@link
-     * #UploadSessionAppendBuilder}.
+     * #uploadSessionAppendBuilder}.
      */
     public final class UploadSessionAppendBuilder extends DbxUploadStyleBuilder<Object,UploadSessionLookupError,UploadSessionAppendException>
     {
@@ -7071,7 +8036,7 @@ public final class Files {
         public UploadSessionAppendUploader start() throws UploadSessionAppendException, DbxException
         {
             UploadSessionCursor arg = new UploadSessionCursor(sessionId, offset);
-            return Files.this.uploadSessionAppend(arg);
+            return DbxFiles.this.uploadSessionAppend(arg);
         }
     }
     /**
@@ -7139,7 +8104,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxUploadStyleBuilder} returned by {@link
-     * #UploadSessionFinishBuilder}.
+     * #uploadSessionFinishBuilder}.
      */
     public final class UploadSessionFinishBuilder extends DbxUploadStyleBuilder<FileMetadata,UploadSessionFinishError,UploadSessionFinishException>
     {
@@ -7153,7 +8118,7 @@ public final class Files {
         public UploadSessionFinishUploader start() throws UploadSessionFinishException, DbxException
         {
             UploadSessionFinishArg arg = new UploadSessionFinishArg(cursor, commit);
-            return Files.this.uploadSessionFinish(arg);
+            return DbxFiles.this.uploadSessionFinish(arg);
         }
     }
     /**
@@ -7220,7 +8185,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxUploadStyleBuilder} returned by {@link
-     * #UploadBuilder}.
+     * #uploadBuilder}.
      */
     public final class UploadBuilder extends DbxUploadStyleBuilder<FileMetadata,UploadError,UploadException>
     {
@@ -7256,7 +8221,7 @@ public final class Files {
         public UploadUploader start() throws UploadException, DbxException
         {
             CommitInfo arg = new CommitInfo(path, mode, autorename, clientModified, mute);
-            return Files.this.upload(arg);
+            return DbxFiles.this.upload(arg);
         }
     }
     /**
@@ -7284,7 +8249,7 @@ public final class Files {
     /**
      * Searches for files and folders.
      */
-    private SearchResults search(SearchQuery arg)
+    private SearchResult search(SearchArg arg)
             throws SearchException, DbxException
     {
         try {
@@ -7293,8 +8258,8 @@ public final class Files {
                                            client.getHost().api,
                                            "2-beta-2/files/search",
                                            arg,
-                                           SearchQuery._writer,
-                                           SearchResults._reader,
+                                           SearchArg._writer,
+                                           SearchResult._reader,
                                            SearchError._reader);
         }
         catch (DbxRequestUtil.ErrorWrapper ew) {
@@ -7304,14 +8269,14 @@ public final class Files {
     /**
      * Searches for files and folders.
      */
-    public SearchResults search(String path, String query)
+    public SearchResult search(String path, String query)
           throws SearchException, DbxException
     {
-        SearchQuery arg = new SearchQuery(path, query, null, null, null);
+        SearchArg arg = new SearchArg(path, query, null, null, null);
         return search(arg);
     }
     /**
-     * The builder object returned by {@link #SearchBuilder}
+     * The builder object returned by {@link #searchBuilder}
      */
     public final class SearchBuilder
     {
@@ -7340,10 +8305,10 @@ public final class Files {
             this.mode = mode;
             return this;
         }
-        public SearchResults start() throws SearchException, DbxException
+        public SearchResult start() throws SearchException, DbxException
         {
-            SearchQuery arg = new SearchQuery(path, query, start, maxResults, mode);
-            return Files.this.search(arg);
+            SearchArg arg = new SearchArg(path, query, start, maxResults, mode);
+            return DbxFiles.this.search(arg);
         }
     }
     /**
@@ -7369,10 +8334,7 @@ public final class Files {
         }
     }
     /**
-     * Create a folder at a given path. No file or folder may exist at the path.
-     * The parent folder will be created if it does not already exist (and so
-     * on). If the parent exists it must be a folder (and the same for any
-     * ancestor). If an ancestor is a shared folder it must have write access.
+     * Create a folder at a given path.
      */
     private FolderMetadata createFolder(CreateFolderArg arg)
             throws CreateFolderException, DbxException
@@ -7392,10 +8354,7 @@ public final class Files {
         }
     }
     /**
-     * Create a folder at a given path. No file or folder may exist at the path.
-     * The parent folder will be created if it does not already exist (and so
-     * on). If the parent exists it must be a folder (and the same for any
-     * ancestor). If an ancestor is a shared folder it must have write access.
+     * Create a folder at a given path.
      */
     public FolderMetadata createFolder(String path)
           throws CreateFolderException, DbxException
@@ -7419,7 +8378,7 @@ public final class Files {
         }
     }
     /**
-     * Delete the file or folder at a given path. If the path is a folder all
+     * Delete the file or folder at a given path. If the path is a folder, all
      * its contents will be deleted too.
      */
     private Metadata delete(DeleteArg arg)
@@ -7440,7 +8399,7 @@ public final class Files {
         }
     }
     /**
-     * Delete the file or folder at a given path. If the path is a folder all
+     * Delete the file or folder at a given path. If the path is a folder, all
      * its contents will be deleted too.
      */
     public Metadata delete(String path)
@@ -7448,6 +8407,52 @@ public final class Files {
     {
         DeleteArg arg = new DeleteArg(path);
         return delete(arg);
+    }
+
+    /**
+     * Exception thrown by {@link #permanentlyDelete}.
+     */
+    public static class PermanentlyDeleteException extends DbxApiException {
+        /**
+         * The error reported by permanentlyDelete.
+         */
+        public final DeleteError errorValue;
+
+        public PermanentlyDeleteException(DeleteError errorValue) {
+            super("Exception in permanently_delete: " + errorValue);
+            this.errorValue = errorValue;
+        }
+    }
+    /**
+     * Permanently delete the file or folder at a given path (see
+     * https://www.dropbox.com/en/help/40).
+     */
+    private void permanentlyDelete(DeleteArg arg)
+            throws PermanentlyDeleteException, DbxException
+    {
+        try {
+            DbxRawClientV2.rpcStyle(client.getRequestConfig(),
+                                    client.getAccessToken(),
+                                    client.getHost().api,
+                                    "2-beta-2/files/permanently_delete",
+                                    arg,
+                                    DeleteArg._writer,
+                                    JsonReader.VoidReader,
+                                    DeleteError._reader);
+        }
+        catch (DbxRequestUtil.ErrorWrapper ew) {
+            throw new PermanentlyDeleteException((DeleteError) (ew.errValue));
+        }
+    }
+    /**
+     * Permanently delete the file or folder at a given path (see
+     * https://www.dropbox.com/en/help/40).
+     */
+    public void permanentlyDelete(String path)
+          throws PermanentlyDeleteException, DbxException
+    {
+        DeleteArg arg = new DeleteArg(path);
+        permanentlyDelete(arg);
     }
 
     /**
@@ -7465,9 +8470,8 @@ public final class Files {
         }
     }
     /**
-     * Copy a file or folder to a different destination in the user's Dropbox.
-     * If the source path is a folder all its contents will be copied. The
-     * destination path must not yet exist.
+     * Copy a file or folder to a different location in the user's Dropbox. If
+     * the source path is a folder all its contents will be copied.
      */
     private Metadata copy(RelocationArg arg)
             throws CopyException, DbxException
@@ -7487,9 +8491,8 @@ public final class Files {
         }
     }
     /**
-     * Copy a file or folder to a different destination in the user's Dropbox.
-     * If the source path is a folder all its contents will be copied. The
-     * destination path must not yet exist.
+     * Copy a file or folder to a different location in the user's Dropbox. If
+     * the source path is a folder all its contents will be copied.
      */
     public Metadata copy(String fromPath, String toPath)
           throws CopyException, DbxException
@@ -7513,9 +8516,8 @@ public final class Files {
         }
     }
     /**
-     * Move a file or folder to a different destination in the user's Dropbox.
-     * If the source path is a folder all its contents will be moved. The
-     * destination path must not yet exist.
+     * Move a file or folder to a different location in the user's Dropbox. If
+     * the source path is a folder all its contents will be moved.
      */
     private Metadata move(RelocationArg arg)
             throws MoveException, DbxException
@@ -7535,9 +8537,8 @@ public final class Files {
         }
     }
     /**
-     * Move a file or folder to a different destination in the user's Dropbox.
-     * If the source path is a folder all its contents will be moved. The
-     * destination path must not yet exist.
+     * Move a file or folder to a different location in the user's Dropbox. If
+     * the source path is a folder all its contents will be moved.
      */
     public Metadata move(String fromPath, String toPath)
           throws MoveException, DbxException
@@ -7561,7 +8562,10 @@ public final class Files {
         }
     }
     /**
-     * Get a thumbnail for an image.
+     * Get a thumbnail for an image. This method currently supports files with
+     * the following file extensions: jpg, jpeg, png, tiff, tif, gif and bmp.
+     * Photos that are larger than 20MB in size won't be converted to a
+     * thumbnail.
      */
     private com.dropbox.core.DbxDownloader<FileMetadata> getThumbnail(ThumbnailArg arg)
             throws GetThumbnailException, DbxException
@@ -7582,7 +8586,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxDownloadStyleBuilder} returned by
-     * {@link #GetThumbnailBuilder}.
+     * {@link #getThumbnailBuilder}.
      */
     public final class GetThumbnailBuilder extends DbxDownloadStyleBuilder<FileMetadata>
     {
@@ -7606,11 +8610,14 @@ public final class Files {
         public com.dropbox.core.DbxDownloader<FileMetadata> start() throws GetThumbnailException, DbxException
         {
             ThumbnailArg arg = new ThumbnailArg(path, format, size);
-            return Files.this.getThumbnail(arg);
+            return DbxFiles.this.getThumbnail(arg);
         }
     }
     /**
-     * Get a thumbnail for an image.
+     * Get a thumbnail for an image. This method currently supports files with
+     * the following file extensions: jpg, jpeg, png, tiff, tif, gif and bmp.
+     * Photos that are larger than 20MB in size won't be converted to a
+     * thumbnail.
      */
     public GetThumbnailBuilder getThumbnailBuilder(String path)
     {
@@ -7655,7 +8662,7 @@ public final class Files {
     }
     /**
      * The {@link com.dropbox.core.v2.DbxDownloadStyleBuilder} returned by
-     * {@link #GetPreviewBuilder}.
+     * {@link #getPreviewBuilder}.
      */
     public final class GetPreviewBuilder extends DbxDownloadStyleBuilder<FileMetadata>
     {
@@ -7673,7 +8680,7 @@ public final class Files {
         public com.dropbox.core.DbxDownloader<FileMetadata> start() throws GetPreviewException, DbxException
         {
             PreviewArg arg = new PreviewArg(path, rev);
-            return Files.this.getPreview(arg);
+            return DbxFiles.this.getPreview(arg);
         }
     }
     /**
